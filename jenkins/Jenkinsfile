@@ -46,9 +46,12 @@ pipeline {
             steps {
                 sshagent(credentials: [SSH_CRED]) {
                     sh """
-                        scp -o StrictHostKeyChecking=no target/*.jar ubuntu@${APP_SERVER}:${REMOTE_DIR}/
-                        ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} "pkill -f '.jar' || true; nohup /usr/bin/java -jar ${REMOTE_DIR}/*.jar > ${REMOTE_DIR}/app.log 2>&1 &"
-                    """
+                scp -o StrictHostKeyChecking=no target/*.jar ubuntu@${APP_SERVER}:${REMOTE_DIR}/
+                ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER} << 'EOF'
+pkill -f '.jar' || true
+nohup /usr/bin/java -jar ${REMOTE_DIR}/*.jar > ${REMOTE_DIR}/app.log 2>&1 &
+EOF
+            """
                 }
             }
         }
